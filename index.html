@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tablas de Multiplicar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script>
+try{var t=localStorage.getItem("multiplica-theme");if(t)document.documentElement.setAttribute("data-theme",t);var g=JSON.parse(localStorage.getItem("multiplica")||"{}").bg;if(g)document.documentElement.setAttribute("data-bg",g)}catch(e){}
+</script>
+<style>
+:root{
+  --bg:#f2f5fa;--grid:rgba(47,91,234,.08);--surface:#fff;--ink:#101a33;--muted:#59657f;--line:#dbe2ee;
+  --accent:#2f5bea;--accent-ink:#fff;--accent-soft:#e6ecff;--hi:#ffd84d;--hi-ink:#101a33;
+  --ok:#0b7a53;--ok-bg:#e1f5ec;--bad:#b3283c;--bad-bg:#fcebee;--shadow:0 10px 30px rgba(20,35,80,.08);
+  color-scheme:light;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1222;--grid:rgba(123,156,255,.07);--surface:#151d33;--ink:#eaf0ff;--muted:#9aa7c7;--line:#27314f;
+    --accent:#7b9cff;--accent-ink:#0c1222;--accent-soft:#1f2b50;--ok:#4fd6a0;--ok-bg:#123428;
+    --bad:#ff8a9a;--bad-bg:#3a1a24;--shadow:0 10px 30px rgba(0,0,0,.35);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1222;--grid:rgba(123,156,255,.07);--surface:#151d33;--ink:#eaf0ff;--muted:#9aa7c7;--line:#27314f;
+  --accent:#7b9cff;--accent-ink:#0c1222;--accent-soft:#1f2b50;--ok:#4fd6a0;--ok-bg:#123428;
+  --bad:#ff8a9a;--bad-bg:#3a1a24;--shadow:0 10px 30px rgba(0,0,0,.35);color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  font-family:"Lexend","Segoe UI",system-ui,Arial,sans-serif;color:var(--ink);line-height:1.55;min-height:100vh;
+  background-color:var(--bg);
+  background-image:var(--bgimg);
+  background-size:var(--bgsize);
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{width:min(1080px,92%);margin:0 auto;padding:22px 0 48px}
+.hidden{display:none!important}
+
+/* Cabecera */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:1.3rem}
+.logo{width:42px;height:42px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:1.5rem;transform:rotate(-6deg)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:.85rem;color:var(--muted)}
+.chip b{color:var(--ink)}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:1.15rem}
+.icon-btn:hover{border-color:var(--accent)}
+
+.intro h1{font-size:clamp(1.9rem,5vw,3rem);line-height:1.12;letter-spacing:-.03em;font-weight:800;max-width:15em}
+.intro h1 mark{background:linear-gradient(transparent 58%,var(--hi) 58%);color:inherit;padding:0 .12em}
+.intro p{color:var(--muted);margin:12px 0 24px;max-width:36em}
+
+/* Pestañas */
+.tabs{display:inline-grid;grid-template-columns:repeat(3,auto);gap:4px;padding:5px;background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:24px;max-width:100%}
+.tab{border:0;background:transparent;border-radius:12px;padding:11px 18px;font-weight:600;color:var(--muted);white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* Tarjetas base */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:var(--shadow)}
+.h2{font-size:1.35rem;font-weight:700;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:.92rem}
+.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:700;transition:filter .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--accent);color:var(--accent-ink)}
+.btn-p:hover{filter:brightness(1.08)}
+.btn-s{background:var(--accent-soft);color:var(--accent)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+/* Selector numérico */
+.nums{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px}
+.num{min-width:48px;height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:1.1rem;position:relative}
+.num:hover{border-color:var(--accent)}
+.num[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.num.mastered::after{content:"★";position:absolute;top:-7px;right:-5px;font-size:.8rem;background:var(--hi);color:var(--hi-ink);border-radius:50%;width:18px;height:18px;display:grid;place-items:center}
+
+/* Estudiar */
+.study{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.lines{display:grid;gap:0;border-radius:14px;border:1px solid var(--line);overflow:hidden}
+.line{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border:0;border-bottom:1px solid var(--line);background:var(--surface);text-align:left;font-size:1.05rem;width:100%}
+.line:last-child{border-bottom:0}
+.line:hover{background:var(--accent-soft)}
+.line[aria-pressed="true"]{background:var(--accent-soft)}
+.line .res{font-weight:800;padding:1px 10px;border-radius:6px}
+.line[aria-pressed="true"] .res{background:var(--hi);color:var(--hi-ink)}
+.visual{text-align:center}
+.eq-big{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:800;letter-spacing:-.03em;margin:6px 0 16px}
+.dots{display:grid;gap:6px;justify-content:center;margin:0 auto 14px}
+.dot{width:clamp(14px,2.6vw,22px);aspect-ratio:1;border-radius:50%;background:var(--accent);opacity:.85}
+.dot.last{background:var(--hi);opacity:1}
+.hintline{color:var(--muted);font-size:.9rem;margin-bottom:18px}
+
+/* Selector de práctica */
+.picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.pick{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px}
+.pick:hover{border-color:var(--accent);transform:translateY(-2px)}
+.pick strong{font-size:1.8rem;display:block;line-height:1.1}
+.pick span{color:var(--muted);font-size:.82rem;display:block;margin-top:4px}
+.stars{color:var(--hi);letter-spacing:2px;font-size:1rem;-webkit-text-stroke:.5px var(--muted)}
+.stars .off{color:transparent}
+
+/* Quiz */
+.quiz{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(220px,.8fr);gap:18px}
+.q-top{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:.9rem}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:14px 0 28px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+.q-text{text-align:center;font-size:clamp(2.8rem,8vw,4.6rem);font-weight:800;letter-spacing:-.04em;margin:6px 0 22px;font-variant-numeric:tabular-nums}
+.q-text.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.q-text.shake{animation:none}.bar i,.btn,.pick{transition:none}}
+.form{display:flex;gap:10px;max-width:440px;margin:auto}
+.form input{flex:1;min-width:0;padding:14px 16px;border-radius:13px;border:2px solid var(--line);background:var(--bg);font-size:1.3rem;font-weight:700;text-align:center;outline:none}
+.form input:focus{border-color:var(--accent)}
+.fb{max-width:440px;margin:14px auto 0;padding:12px 14px;border-radius:12px;font-size:.92rem;display:none;text-align:center}
+.fb.good{display:block;background:var(--ok-bg);color:var(--ok)}
+.fb.bad{display:block;background:var(--bad-bg);color:var(--bad)}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px}
+.side .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.stat{background:var(--bg);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.78rem}
+.tip{background:var(--accent-soft);color:var(--accent);border-radius:12px;padding:12px;font-size:.86rem}
+
+/* Resultados */
+.done{text-align:center;padding:20px 8px}
+.done .medal{font-size:3.4rem}
+.done h2{font-size:1.8rem;margin:6px 0}
+.done .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:420px;margin:20px auto}
+.done .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* Reto aleatorio */
+.setup{display:grid;gap:22px;max-width:560px}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px}
+.seg button{border:0;background:transparent;padding:9px 18px;border-radius:9px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.lbl{font-weight:600;display:block}
+.modes{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0 4px}
+
+:root{--dot:rgba(47,91,234,.26);--img-grid:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);--img-dots:radial-gradient(var(--dot) 1.6px,transparent 1.8px);
+--img-formulas:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='240'><g fill='%237f8fc4' fill-opacity='.2' font-family='Georgia,serif' font-style='italic'><text x='14' y='40' font-size='22'>a²+b²=c²</text><text x='200' y='70' font-size='26' transform='rotate(-8 200 70)'>π r²</text><text x='30' y='130' font-size='24'>∑ n = n(n+1)/2</text><text x='230' y='150' font-size='20'>7 × 8 = 56</text><text x='20' y='205' font-size='26' transform='rotate(6 20 205)'>√x</text><text x='140' y='215' font-size='20'>½·b·h</text><text x='285' y='225' font-size='22'>9×9</text><text x='150' y='105' font-size='18'>x² − 1</text></g></svg>");
+--bgimg:var(--img-grid);--bgsize:28px 28px}
+:root[data-bg="dots"]{--bgimg:var(--img-dots);--bgsize:22px 22px}
+:root[data-bg="formulas"]{--bgimg:var(--img-formulas);--bgsize:360px 240px}
+:root[data-bg="plain"]{--bgimg:none;--bgsize:auto}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--dot:rgba(123,156,255,.24)}}
+:root[data-theme="dark"]{--dot:rgba(123,156,255,.24)}
+.hello{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.pbtn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 14px 4px 4px;font-weight:600;max-width:190px;min-height:42px}
+.pbtn:hover{border-color:var(--accent)}
+.pname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:color-mix(in srgb,hsl(var(--h) 80% 60%) 35%,var(--surface));font-size:1.6rem;line-height:1}
+.av.sm{width:34px;height:34px;font-size:1.15rem}
+.av.a0{animation:bob 3s ease-in-out infinite}
+.av.a1{animation:wig 3.4s ease-in-out infinite}
+.av.a2{animation:sway 4s ease-in-out infinite}
+.av.a3{animation:pop 2.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes wig{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-10deg)}85%{transform:rotate(10deg)}}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes pop{50%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.av{animation:none!important}}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(8,12,28,.58);display:grid;place-items:center;padding:16px;overflow:auto}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:var(--shadow);outline:none}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0 8px}
+.fields label{display:grid;gap:6px;font-weight:600;font-size:.88rem}
+.fields input,.custom input{padding:11px 13px;border-radius:12px;border:2px solid var(--line);background:var(--bg);font-size:1rem;outline:none}
+.fields input:focus,.custom input:focus{border-color:var(--accent)}
+.err{color:var(--bad);font-size:.88rem;min-height:1.4em}
+.avs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0 18px}
+.avb{border:2px solid transparent;background:transparent;border-radius:16px;padding:4px;display:grid;place-items:center}
+.avb:hover{background:var(--accent-soft)}
+.avb[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.sheet .btns{display:flex;gap:10px;flex-wrap:wrap}
+.bgs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.bgb{text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:10px;display:grid;gap:2px}
+.bgb[aria-checked="true"]{border-color:var(--accent)}
+.bgb small{color:var(--muted)}
+.prev{display:block;height:70px;border-radius:10px;border:1px solid var(--line);background-color:var(--bg);margin-bottom:6px}
+.prev[data-bg="grid"]{background-image:var(--img-grid);background-size:28px 28px}
+.prev[data-bg="dots"]{background-image:var(--img-dots);background-size:22px 22px}
+.prev[data-bg="formulas"]{background-image:var(--img-formulas);background-size:360px 240px}
+.custom{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.custom input{width:110px}
+#qc.warn{color:var(--bad);font-weight:700}
+.chip.keep.paused{opacity:.65}
+footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:34px}
+.copy{margin-top:10px;padding-top:12px;border-top:1px solid var(--line);font-weight:600;color:var(--ink)}
+
+@media (max-width:860px){.study,.quiz{grid-template-columns:1fr}}
+@media (max-width:560px){
+  .wrap{width:94%}
+  .chip:not(.keep){display:none}
+  .pname{display:none}
+  .pbtn{padding:4px}
+  .top{flex-wrap:wrap}
+  .card{padding:18px}
+  .tabs{display:grid;width:100%}
+  .tab{padding:11px 6px;font-size:.78rem}
+  .picker{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form{flex-direction:column}
+  .done .stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo" aria-hidden="true">×</div>Multiplica</div>
+    <div class="top-actions">
+      <button class="pbtn" id="profile-btn" aria-label="Perfil">Perfil</button>
+      <div class="chip keep" id="sess-chip" role="timer" title="En pausa"><span aria-hidden="true">⏱</span> <b id="sess">00:00</b></div>
+      <div class="chip">Resueltas: <b id="solved">0</b></div>
+      <button class="icon-btn" id="bg-btn" aria-label="Elegir fondo" title="Fondo">🎨</button>
+      <button class="icon-btn" id="theme" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar tema"></button>
+    </div>
+  </header>
+
+  <section class="intro">
+    <div class="hello" id="hello"></div>
+    <h1>Aprende las tablas de multiplicar <mark>a tu ritmo</mark></h1>
+    <p>Mira cómo funciona cada multiplicación, practica una tabla completa o mezcla varias en un reto.</p>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Secciones">
+    <button class="tab" role="tab" data-view="study" aria-selected="true">Estudiar</button>
+    <button class="tab" role="tab" data-view="practice" aria-selected="false">Practicar una tabla</button>
+    <button class="tab" role="tab" data-view="random" aria-selected="false">Reto mixto</button>
+  </div>
+
+  <main>
+    <section id="v-study" role="tabpanel"></section>
+    <section id="v-practice" role="tabpanel" class="hidden"></section>
+    <section id="v-random" role="tabpanel" class="hidden"></section>
+  </main>
+
+  <footer>Practica un poco cada día y verás tu progreso. Tu avance se guarda en este dispositivo.<p class="copy">© 2026 Create by Wilfredo Vásquez.</p></footer>
+</div>
+
+<div class="modal hidden" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title"></div>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* ---------- Almacenamiento (con respaldo si no está disponible) ---------- */
+let saved={stars:{},starsMix:{},solved:0};
+const prac={mode:"order",count:20};
+function mixedTable(n,count){let qs=[];while(qs.length<count){const s=shuffle(Array.from({length:10},(_,i)=>({a:n,b:i+1})));if(qs.length&&s[0].b===qs[qs.length-1].b)s.push(s.shift());qs=qs.concat(s)}return qs.slice(0,count)}
+try{saved=Object.assign(saved,JSON.parse(localStorage.getItem("multiplica")||"{}"))}catch(e){}
+const persist=()=>{try{localStorage.setItem("multiplica",JSON.stringify(saved))}catch(e){}};
+const starsHTML=n=>`<span class="stars" aria-label="${n} de 3 estrellas">${[1,2,3].map(i=>i<=n?"★":'<span class="off">★</span>').join("")}</span>`;
+const refreshSolved=()=>$("#solved").textContent=saved.solved;
+
+/* ---------- Tema claro / oscuro ---------- */
+const root=document.documentElement;
+const isDark=()=>root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+function paintTheme(){$("#theme").textContent=isDark()?"☀️":"🌙"}
+$("#theme").addEventListener("click",()=>{
+  const next=isDark()?"light":"dark";
+  root.dataset.theme=next;
+  try{localStorage.setItem("multiplica-theme",next)}catch(e){}
+  paintTheme();
+});
+paintTheme();
+
+/* ---------- Navegación ---------- */
+const state={view:"study",n:3,b:4};
+let cleanup=null;
+function setView(v){
+  if(cleanup){cleanup();cleanup=null}
+  state.view=v;
+  $$(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.view===v));
+  ["study","practice","random"].forEach(n=>$("#v-"+n).classList.toggle("hidden",n!==v));
+  if(v==="study")renderStudy();
+  if(v==="practice")renderPicker();
+  if(v==="random")renderSetup();
+}
+$$(".tab").forEach(t=>t.addEventListener("click",()=>setView(t.dataset.view)));
+
+/* ---------- Estudiar ---------- */
+function numChips(selected,multi){
+  return [1,2,3,4,5,6,7,8,9].map(n=>`<button class="num ${saved.stars[n]?"mastered":""}" data-n="${n}" aria-pressed="${multi?selected.includes(n):selected===n}" aria-label="Tabla del ${n}">${n}</button>`).join("");
+}
+function renderStudy(){
+  const {n,b}=state,box=$("#v-study");
+  box.innerHTML=`
+  <div class="card">
+    <h2 class="h2">Elige una tabla</h2>
+    <p class="sub">Toca una operación para ver cómo se forma con puntos.</p>
+    <div class="nums" id="study-nums">${numChips(n,false)}</div>
+    <div class="study">
+      <div class="lines">${Array.from({length:10},(_,i)=>`
+        <button class="line" data-b="${i+1}" aria-pressed="${i+1===b}"><span>${n} × ${i+1}</span><span class="res">${n*(i+1)}</span></button>`).join("")}
+      </div>
+      <div class="visual card" style="box-shadow:none">
+        <div class="eq-big">${n} × ${b} = ${n*b}</div>
+        <div class="dots" style="grid-template-columns:repeat(${b},auto)" aria-hidden="true">
+          ${Array.from({length:n*b},(_,i)=>`<span class="dot ${i%b===b-1?"last":""}"></span>`).join("")}
+        </div>
+        <p class="hintline">${n} filas de ${b} puntos. Es lo mismo que ${Array(b).fill(n).join(" + ")}.</p>
+        <button class="btn btn-p" id="go-practice">Practicar la tabla del ${n}</button>
+      </div>
+    </div>
+  </div>`;
+  $$("#study-nums .num").forEach(x=>x.addEventListener("click",()=>{state.n=+x.dataset.n;state.b=Math.min(state.b,10);renderStudy()}));
+  $$(".line").forEach(x=>x.addEventListener("click",()=>{state.b=+x.dataset.b;renderStudy()}));
+  $("#go-practice").addEventListener("click",()=>{setView("practice");startTable(state.n)});
+}
+
+/* ---------- Motor del quiz ---------- */
+function runQuiz(box,{title,questions,onExit,onDone,limit=0}){
+  const total=questions.length;
+  let i=0,mistakes=0,first=0,tries=0,t0=Date.now(),locked=false,answered=0,ended=false;
+  box.innerHTML=`
+  <div class="quiz">
+    <div class="card">
+      <div class="q-top"><span>${title}</span><span id="qc"></span></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}"><i id="qb"></i></div>
+      <div class="q-text" id="qt" aria-live="polite"></div>
+      <form class="form" id="qf" novalidate>
+        <input id="qi" type="number" inputmode="numeric" step="1" autocomplete="off" aria-label="Tu respuesta" placeholder="Tu respuesta">
+        <button class="btn btn-p" type="submit" id="qs">Comprobar</button>
+      </form>
+      <div class="fb" id="fb" role="status" aria-live="polite"></div>
+    </div>
+    <aside class="side">
+      <h3 class="h2" style="font-size:1.1rem">Tu progreso</h3>
+      <div class="stats">
+        <div class="stat"><b id="s-ok">0</b><span>Aciertos a la primera</span></div>
+        <div class="stat"><b id="s-bad">0</b><span>Errores</span></div>
+        <div class="stat" style="grid-column:span 2"><b id="s-time">0:00</b><span>${limit?"Tiempo restante":"Tiempo"}</span></div>
+      </div>
+      <div class="tip" id="tip">Piensa en la suma repetida: 3 × 4 es 3 + 3 + 3 + 3.</div>
+      <button class="btn btn-s" id="exit" style="margin-top:14px;width:100%">Salir del quiz</button>
+    </aside>
+  </div>`;
+  const q=$("#qt",box),inp=$("#qi",box),fb=$("#fb",box),bar=$("#qb",box);
+  const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+  const elapsed=()=>Math.round((Date.now()-t0)/1000);
+  const tick=()=>{
+    const e=elapsed();
+    if(limit){
+      const left=Math.max(limit-e,0);
+      $("#s-time",box).textContent=fmt(left);
+      $("#qc",box).innerHTML=`⏳ <b>${fmt(left)}</b> · Correctas: ${answered}`;
+      $("#qc",box).classList.toggle("warn",left<=10);
+      bar.style.width=Math.min(e/limit*100,100)+"%";
+      if(left<=0)finish();
+    }else $("#s-time",box).textContent=fmt(e);
+  };
+  const timer=setInterval(tick,1000);
+  const stop=()=>{clearInterval(timer);quizActive=false};
+  cleanup=stop;quizActive=true;touch();
+  function finish(){
+    if(ended)return;ended=true;stop();cleanup=null;
+    const secs=Math.min(elapsed(),limit||Infinity),done=limit?answered:total,acc=Math.round(first/Math.max(done,1)*100);
+    onDone({total:done,first,mistakes,secs,acc,stars:acc>=90?3:acc>=70?2:1,timed:!!limit});
+  }
+
+  function show(){
+    const {a,b}=questions[i];
+    q.textContent=`${a} × ${b}`;
+    if(!limit){$("#qc",box).textContent=`Pregunta ${i+1} de ${total}`;bar.style.width=(i/total*100)+"%"}
+    $(".bar",box).setAttribute("aria-valuenow",i);
+    inp.value="";inp.disabled=false;$("#qs",box).disabled=false;
+    fb.className="fb";fb.textContent="";tries=0;locked=false;
+    inp.focus();
+  }
+  $("#qf",box).addEventListener("submit",e=>{
+    e.preventDefault();
+    if(locked)return;
+    const raw=inp.value.trim();
+    if(raw===""){fb.className="fb bad";fb.textContent="Escribe un número para comprobar.";inp.focus();return}
+    const {a,b}=questions[i];
+    if(Number(raw)===a*b){
+      locked=true;
+      if(tries===0)first++;
+      answered++;
+      $("#s-ok",box).textContent=first;
+      fb.className="fb good";fb.textContent="¡Correcto!";
+      inp.disabled=true;$("#qs",box).disabled=true;
+      if(!limit)bar.style.width=((i+1)/total*100)+"%";
+      setTimeout(()=>{
+        if(ended)return;
+        i++;
+        if(i>=total)finish();else show();
+      },600);
+    }else{
+      tries++;mistakes++;
+      $("#s-bad",box).textContent=mistakes;
+      q.classList.remove("shake");void q.offsetWidth;q.classList.add("shake");
+      fb.className="fb bad";
+      fb.textContent=tries>=2
+        ?`Pista: ${a} × ${b} es ${Array(b).fill(a).join(" + ")}. Suma con calma.`
+        :"Todavía no. Inténtalo otra vez.";
+      inp.select();
+    }
+  });
+  $("#exit",box).addEventListener("click",()=>{stop();cleanup=null;onExit()});
+  show();
+  tick();
+}
+function results(box,{title,r,actions}){
+  const m=Math.floor(r.secs/60)+":"+String(r.secs%60).padStart(2,"0");
+  box.innerHTML=`
+  <div class="card done">
+    <div class="medal" aria-hidden="true">${r.stars===3?"🏆":r.stars===2?"🎉":"💪"}</div>
+    <h2>${title}</h2>
+    <div>${r.timed?"":starsHTML(r.stars)}</div>
+    <p class="sub">${r.timed?"Se acabó el tiempo. Estas son tus estadísticas.":""}${r.timed?"":r.acc>=90?"Dominas esta práctica.":r.acc>=70?"Muy bien. Un poco más y la dominas.":"Buen intento. Repite para afianzarla."}</p>
+    <div class="stats">
+      <div class="stat"><b>${r.timed?r.total:r.acc+"%"}</b><span>${r.timed?"Respuestas correctas":"Aciertos a la primera"}</span></div>
+      <div class="stat"><b>${r.mistakes}</b><span>Errores</span></div>
+      <div class="stat"><b>${m}</b><span>Tiempo</span></div>
+    </div>
+    <div class="btns">${actions.map((a,i)=>`<button class="btn ${i?"btn-s":"btn-p"}" data-a="${i}">${a.label}</button>`).join("")}</div>
+  </div>`;
+  $$("[data-a]",box).forEach(b=>b.addEventListener("click",()=>actions[b.dataset.a].run()));
+}
+
+/* ---------- Practicar una tabla ---------- */
+function renderPicker(){
+  const box=$("#v-practice");
+  $("#v-practice").innerHTML=`
+  <div class="card">
+    <h2 class="h2">Practica una tabla</h2>
+    <p class="sub">Elige cómo practicar. Si fallas, vuelve a intentarlo hasta acertar.</p>
+    <div class="modes">
+      <div class="seg" id="p-mode">
+        <button data-m="order" aria-pressed="${prac.mode==="order"}">En orden (×1 a ×10)</button>
+        <button data-m="mixed" aria-pressed="${prac.mode==="mixed"}">Preguntas mezcladas</button>
+      </div>
+      ${prac.mode==="mixed"?`<div class="seg" id="p-count">${[10,20,30,50].map(c=>`<button data-c="${c}" aria-pressed="${prac.count===c}">${c} preguntas</button>`).join("")}</div>`:""}
+    </div>
+    <div class="picker">${[1,2,3,4,5,6,7,8,9].map(n=>{const s=(prac.mode==="mixed"?saved.starsMix:saved.stars)[n];return `
+      <button class="pick" data-n="${n}"><strong>${n}</strong><span>${prac.mode==="mixed"?"Mezcladas":"En orden"}: tabla del ${n}</span>${s?starsHTML(s):'<span>Sin completar</span>'}</button>`}).join("")}
+    </div>
+  </div>`;
+  $$("#p-mode button",box).forEach(x=>x.addEventListener("click",()=>{prac.mode=x.dataset.m;renderPicker()}));
+  $$("#p-count button",box).forEach(x=>x.addEventListener("click",()=>{prac.count=+x.dataset.c;renderPicker()}));
+  $$(".pick",box).forEach(p=>p.addEventListener("click",()=>startTable(+p.dataset.n)));
+}
+function startTable(n){
+  const box=$("#v-practice");
+  const mixed=prac.mode==="mixed";
+  runQuiz(box,{
+    title:mixed?`Tabla del ${n} · mezcladas`:`Tabla del ${n}`,
+    questions:mixed?mixedTable(n,prac.count):Array.from({length:10},(_,i)=>({a:n,b:i+1})),
+    onExit:renderPicker,
+    onDone:r=>{
+      const key=mixed?"starsMix":"stars";saved[key][n]=Math.max(saved[key][n]||0,r.stars);
+      saved.solved+=r.total;persist();refreshSolved();
+      results(box,{title:mixed?`Tabla del ${n} mezclada completada`:`Tabla del ${n} completada`,r,actions:[
+        {label:"Practicar otra vez",run:()=>startTable(n)},
+        n<9?{label:`Seguir con la del ${n+1}`,run:()=>startTable(n+1)}:{label:"Elegir otra tabla",run:renderPicker},
+        {label:"Elegir otra tabla",run:renderPicker}
+      ].filter((a,i,arr)=>arr.findIndex(x=>x.label===a.label)===i)});
+    }
+  });
+}
+
+/* ---------- Reto mixto ---------- */
+const rnd={tables:[1,2,3,4,5,6,7,8,9],count:20,mode:"count",time:120,custom:{v:2,unit:"min"}};
+function getLimit(){if(rnd.time)return rnd.time;const v=Number(rnd.custom.v);if(!(v>0))return 0;const s=Math.round(v*(rnd.custom.unit==="min"?60:1));return s>=10&&s<=3600?s:0}
+function renderSetup(){
+  const box=$("#v-random");
+  box.innerHTML=`
+  <div class="card setup">
+    <div><h2 class="h2">Arma tu reto mixto</h2><p class="sub">Elige qué tablas quieres repasar y cuántas preguntas responder.</p></div>
+    <div><span class="lbl">Tablas</span>
+      <div class="nums" id="r-nums" style="margin-bottom:8px">${numChips(rnd.tables,true)}</div>
+      <button class="btn btn-s" id="r-all" style="padding:7px 14px;font-size:.85rem">Seleccionar todas</button>
+    </div>
+    <div><span class="lbl" style="margin-bottom:8px">Modo</span>
+      <div class="seg" id="r-mode"><button data-m="count" aria-pressed="${rnd.mode==="count"}">Por preguntas</button><button data-m="time" aria-pressed="${rnd.mode==="time"}">Contra reloj</button></div>
+    </div>
+    ${rnd.mode==="count"?`<div><span class="lbl" style="margin-bottom:8px">Preguntas</span>
+      <div class="seg" id="r-count">${[10,20,30,50,60,70].map(c=>`<button data-c="${c}" aria-pressed="${rnd.count===c}">${c}</button>`).join("")}</div></div>`
+    :`<div><span class="lbl" style="margin-bottom:8px">Límite de tiempo</span>
+      <div class="seg" id="r-time">${[60,120,180].map(t=>`<button data-t="${t}" aria-pressed="${rnd.time===t}">${t/60}:00</button>`).join("")}<button data-t="0" aria-pressed="${rnd.time===0}">Elige tu tiempo</button></div>
+      ${rnd.time===0?`<div class="custom"><input id="r-cv" type="number" min="1" max="3600" step="1" inputmode="numeric" value="${rnd.custom.v}" aria-label="Cantidad de tiempo"><div class="seg" id="r-unit"><button data-u="min" aria-pressed="${rnd.custom.unit==="min"}">minutos</button><button data-u="seg" aria-pressed="${rnd.custom.unit==="seg"}">segundos</button></div></div>`:""}</div>`}
+    <div><button class="btn btn-p" id="r-go" ${rnd.tables.length?"":"disabled"}>Empezar el reto</button>
+    <p class="sub" id="r-msg" style="margin-top:8px">${rnd.tables.length?"":"Elige al menos una tabla."}</p></div>
+  </div>`;
+  $$("#r-nums .num",box).forEach(x=>x.addEventListener("click",()=>{
+    const n=+x.dataset.n;
+    rnd.tables=rnd.tables.includes(n)?rnd.tables.filter(t=>t!==n):[...rnd.tables,n].sort((a,b)=>a-b);
+    renderSetup();
+  }));
+  $("#r-all",box).addEventListener("click",()=>{rnd.tables=[1,2,3,4,5,6,7,8,9];renderSetup()});
+  $$("#r-count button",box).forEach(x=>x.addEventListener("click",()=>{rnd.count=+x.dataset.c;renderSetup()}));
+  $$("#r-mode button",box).forEach(x=>x.addEventListener("click",()=>{rnd.mode=x.dataset.m;renderSetup()}));
+  $$("#r-time button",box).forEach(x=>x.addEventListener("click",()=>{rnd.time=+x.dataset.t;renderSetup()}));
+  $$("#r-unit button",box).forEach(x=>x.addEventListener("click",()=>{rnd.custom.unit=x.dataset.u;renderSetup()}));
+  const cv=$("#r-cv",box);if(cv)cv.addEventListener("input",()=>{rnd.custom.v=cv.value});
+  $("#r-go",box).addEventListener("click",()=>{
+    if(rnd.mode==="time"&&!getLimit()){$("#r-msg",box).textContent="Elige un tiempo entre 10 segundos y 60 minutos.";if(cv)cv.focus();return}
+    startRandom();
+  });
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startRandom(){
+  const box=$("#v-random");
+  const limit=rnd.mode==="time"?getLimit():0,want=limit?300:rnd.count;
+  const pool=rnd.tables.flatMap(a=>Array.from({length:10},(_,i)=>({a,b:i+1})));
+  let qs=[];
+  while(qs.length<want)qs=qs.concat(shuffle([...pool]));
+  qs=qs.slice(0,want).map(q=>Math.random()<.5?q:{a:q.b<=9?q.b:q.a,b:q.b<=9?q.a:q.b});
+  runQuiz(box,{
+    title:limit?"Reto contra reloj":"Reto mixto",questions:qs,onExit:renderSetup,limit,
+    onDone:r=>{
+      saved.solved+=r.total;persist();refreshSolved();
+      results(box,{title:r.timed?"Tiempo terminado":"Reto completado",r,actions:[
+        {label:"Jugar otra vez",run:startRandom},
+        {label:"Cambiar tablas",run:renderSetup}
+      ]});
+    }
+  });
+}
+
+/* ---------- Sesión: cronómetro de práctica activa ---------- */
+let sessSec=0,lastAct=Date.now(),quizActive=false;
+const touch=()=>{lastAct=Date.now()};
+["pointerdown","keydown","input"].forEach(ev=>addEventListener(ev,touch,{passive:true}));
+setInterval(()=>{
+  const on=quizActive&&!document.hidden&&Date.now()-lastAct<30000;
+  if(on)sessSec++;
+  $("#sess").textContent=String(Math.floor(sessSec/60)).padStart(2,"0")+":"+String(sessSec%60).padStart(2,"0");
+  $("#sess-chip").classList.toggle("paused",!on);
+  $("#sess-chip").title=on?"Practicando ahora":"En pausa (se activa al practicar)";
+},1000);
+
+/* ---------- Modal accesible ---------- */
+const modal=$("#modal");let lastFocus=null;
+function openModal(html,dismiss=true){
+  lastFocus=document.activeElement;
+  modal.innerHTML=`<div class="sheet">${html}</div>`;
+  modal.dataset.dismiss=dismiss;modal.classList.remove("hidden");
+  document.body.style.overflow="hidden";
+  const f=$("input,button",modal);if(f)f.focus();
+}
+function closeModal(){
+  modal.classList.add("hidden");modal.innerHTML="";document.body.style.overflow="";
+  if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+modal.addEventListener("mousedown",e=>{if(e.target===modal&&modal.dataset.dismiss==="true")closeModal()});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!modal.classList.contains("hidden")&&modal.dataset.dismiss==="true")closeModal()});
+modal.addEventListener("keydown",e=>{
+  if(e.key!=="Tab")return;
+  const f=$$("button,input",modal);if(!f.length)return;
+  const a=f[0],z=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
+  else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+});
+
+/* ---------- Perfil y avatares ---------- */
+const AVATARS=[["🦊","Zorro"],["🐼","Panda"],["🦁","León"],["🐯","Tigre"],["🐸","Rana"],["🐵","Mono"],["🐧","Pingüino"],["🐨","Koala"],["🐰","Conejo"],["🐶","Perro"],["🐱","Gato"],["🦉","Búho"],["🐙","Pulpo"],["🦄","Unicornio"],["🐢","Tortuga"],["🐘","Elefante"],["🦒","Jirafa"],["🐬","Delfín"],["🦋","Mariposa"],["🐻","Oso"]];
+const avatarHTML=(id,cls="")=>`<span class="av a${id%4} ${cls}" style="--h:${id*18}" aria-hidden="true">${(AVATARS[id]||AVATARS[0])[0]}</span>`;
+function paintProfile(){
+  const p=saved.profile;if(!p)return;
+  const b=$("#profile-btn");
+  b.innerHTML=avatarHTML(p.avatarId,"sm")+'<span class="pname"></span>';
+  $(".pname",b).textContent=p.nombre;
+  b.setAttribute("aria-label",`Perfil de ${p.nombre} ${p.apellido||""}. Editar`);
+  $("#hello").textContent=`¡Hola, ${p.nombre}! 👋`;
+}
+function openProfile(first){
+  const p=saved.profile||{nombre:"",apellido:"",avatarId:0};
+  let av=p.avatarId||0;
+  openModal(`
+    <h2 class="h2" id="m-title">${first?"¡Bienvenido a Multiplica!":"Tu perfil"}</h2>
+    <p class="sub">${first?"Cuéntanos quién eres y elige tu animal favorito.":"Cambia tu nombre o tu avatar."}</p>
+    <form id="pf" novalidate>
+      <div class="fields">
+        <label>Nombre<input id="pf-n" maxlength="24" autocomplete="given-name" required></label>
+        <label>Apellido (opcional)<input id="pf-a" maxlength="24" autocomplete="family-name"></label>
+      </div>
+      <p class="err" id="pf-e" role="alert"></p>
+      <span class="lbl">Elige tu avatar</span>
+      <div class="avs" role="radiogroup" aria-label="Avatar">${AVATARS.map((a,i)=>`<button type="button" class="avb" role="radio" aria-checked="${i===av}" data-i="${i}" aria-label="${a[1]}">${avatarHTML(i)}</button>`).join("")}</div>
+      <div class="btns"><button class="btn btn-p" type="submit">${first?"Empezar":"Guardar"}</button>${first?"":'<button class="btn btn-s" type="button" id="pf-x">Cancelar</button>'}</div>
+    </form>`,!first);
+  $("#pf-n").value=p.nombre||"";$("#pf-a").value=p.apellido||"";
+  $$(".avb").forEach(b=>b.addEventListener("click",()=>{av=+b.dataset.i;$$(".avb").forEach(x=>x.setAttribute("aria-checked",x===b))}));
+  const cancel=$("#pf-x");if(cancel)cancel.addEventListener("click",closeModal);
+  $("#pf").addEventListener("submit",e=>{
+    e.preventDefault();
+    const nombre=$("#pf-n").value.trim();
+    if(!nombre){$("#pf-e").textContent="Escribe tu nombre para continuar.";$("#pf-n").focus();return}
+    saved.profile={nombre,apellido:$("#pf-a").value.trim(),avatarId:av};
+    persist();paintProfile();closeModal();
+  });
+}
+
+/* ---------- Fondos temáticos ---------- */
+const BGS=[["grid","Cuadriculado","Libreta clásica"],["formulas","Fórmulas","Ecuaciones sutiles"],["dots","Puntos","Papel punteado"],["plain","Liso","Sin distracciones"]];
+function openBg(){
+  openModal(`<h2 class="h2" id="m-title">Elige tu fondo</h2><p class="sub">Se adapta al modo claro y al oscuro.</p>
+    <div class="bgs" role="radiogroup" aria-label="Fondo">${BGS.map(b=>`<button class="bgb" role="radio" data-b="${b[0]}" aria-checked="${(saved.bg||"grid")===b[0]}"><span class="prev" data-bg="${b[0]}"></span><b>${b[1]}</b><small>${b[2]}</small></button>`).join("")}</div>
+    <div class="btns"><button class="btn btn-p" id="bg-ok">Listo</button></div>`);
+  $$(".bgb").forEach(b=>b.addEventListener("click",()=>{
+    root.dataset.bg=saved.bg=b.dataset.b;persist();
+    $$(".bgb").forEach(x=>x.setAttribute("aria-checked",x===b));
+  }));
+  $("#bg-ok").addEventListener("click",closeModal);
+}
+
+$("#profile-btn").addEventListener("click",()=>openProfile(false));
+$("#bg-btn").addEventListener("click",openBg);
+root.dataset.bg=saved.bg||"grid";
+refreshSolved();
+setView("study");
+if(saved.profile&&saved.profile.nombre)paintProfile();else openProfile(true);
+</script>
+</body>
+</html>
